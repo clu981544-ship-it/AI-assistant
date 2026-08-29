@@ -3,37 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Chat Assistant</title>
-</head>  <!--这段是网页基础结构 UTF-8是因为用了中文-->
-<body><!--body才是网页真正显示内容的地方-->
-    <h1>AI Chat Assistant</h1><!--h1是一级标题 大标题-->
+</head>
+<body>
+    <h1>AI Chat Assistant</h1>
 
     <input id="messageInput" type="text" placeholder="请输入你的问题">
     <button onclick="sendMessage()">发送</button>
 
-    <div id="chatBox"></div><!--总聊天记录 所有内容都往里面加，聊天内容显示区域-->
+    <div id="chatBox"></div>
 
     <script>
+        const messages = [];
+
         async function sendMessage() {
             const input = document.getElementById("messageInput");
             const chatBox = document.getElementById("chatBox");
-             const userMessage = document.createElement("div");
-                userMessage.innerText = "用户：" + input.value;
-                chatBox.appendChild(userMessage);
+            const userText = input.value;
+
+            const userMessage = document.createElement("div");
+            userMessage.innerText = "用户：" + userText;
+            chatBox.appendChild(userMessage);
+
+            messages.push({
+                role: "user",
+                content: userText
+            });
+
             const response = await fetch("http://127.0.0.1:8000/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    message: input.value
+                    messages: messages
                 })
             });
-            
+
             const data = await response.json();
+
             const aiMessage = document.createElement("div");
             aiMessage.innerText = "AI：" + data.answer;
             chatBox.appendChild(aiMessage);
-        
+
+            messages.push({
+                role: "assistant",
+                content: data.answer
+            });
+
+            input.value = "";
         }
     </script>
 </body>
