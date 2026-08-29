@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
 from app.llm import chat
-
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
 
 app.add_middleware(
@@ -28,9 +29,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return {
-        "message": "AI Chat Assistant API"
-    }
+    return FileResponse("frontend/index.html")
 
 
 @app.get("/health")
