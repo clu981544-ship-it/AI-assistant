@@ -7,18 +7,23 @@
 <body>
     <h1>AI Chat Assistant</h1>
 
-    <input id="messageInput" type="text" placeholder="请输入你的问题">
-    <button onclick="sendMessage()">发送</button>
+    <input id="messageInput" type="text" placeholder="请输入你的问题" onkeydown="handleKeyDown(event)">
+    <button id="sendButton" onclick="sendMessage()">发送</button>
 
     <div id="chatBox"></div>
 
     <script>
         const messages = [];
-
+        function handleKeyDown(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }}
         async function sendMessage() {
             const input = document.getElementById("messageInput");
             const chatBox = document.getElementById("chatBox");
-            const userText = input.value;
+            const sendButton=document.getElementById("sendButton");
+            const userText = input.value.trim();
+            if(userText ===""){return;}
 
             const userMessage = document.createElement("div");
             userMessage.innerText = "用户：" + userText;
@@ -28,8 +33,12 @@
                 role: "user",
                 content: userText
             });
-
-            const response = await fetch("http://127.0.0.1:8000/chat", {
+            const aiMessage = document.createElement("div");
+            aiMessage.innerText = "AI 正在思考...";
+            chatBox.appendChild(aiMessage);
+            sendButton.disabled = true;
+            sendButton.innerText = "发送中...";
+            try{ response = await fetch("http://127.0.0.1:8000/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -40,11 +49,15 @@
             });
 
             const data = await response.json();
-
-            const aiMessage = document.createElement("div");
             aiMessage.innerText = "AI：" + data.answer;
-            chatBox.appendChild(aiMessage);
-
+            chatBox.appendChild(aiMessage);}
+            catch(error)
+            {
+                 aiMessage.innerText = "请求失败，请检查后端服务是否正常运行。";
+            }
+             finally{   
+            sendButton.disabled = false;
+            sendButton.innerText = "发送";}
             messages.push({
                 role: "assistant",
                 content: data.answer
