@@ -4,9 +4,10 @@ from pydantic import BaseModel
 from app.llm import chat
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from app.database import init_db, save_message, get_history
 
 app = FastAPI()
-
+init_db()
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
 app.add_middleware(
@@ -37,7 +38,12 @@ def health():
     return {
         "status": "ok"
     }
-
+    
+@app.get("/history")
+def history():
+    return {
+        "messages": get_history(1)
+    }
 
 @app.post("/chat")
 def chat_api(request: ChatRequest):
@@ -50,7 +56,9 @@ def chat_api(request: ChatRequest):
         })
 
     try:
+        save_message(1, "user", messages[-1]["content"])#-1表示最新的一条消息，就是本次用户输入
         answer = chat(messages)
+        save_message(1, "assistant", answer)
 
         return {
             "answer": answer
