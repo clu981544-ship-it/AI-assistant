@@ -28,9 +28,12 @@ def init_db():
         
         user_id INTEGER,
         
+        conversation_id INTEGER,
+        
         role TEXT,
         
         content TEXT
+        
         
         )
         """
@@ -39,7 +42,7 @@ def init_db():
     conn.commit()
     
     conn.close()
-def get_history(user_id):
+def get_history(user_id, conversation_id):
 
     conn = get_connection()
 
@@ -51,9 +54,10 @@ def get_history(user_id):
         SELECT role,content
         FROM messages
         WHERE user_id=?
+        AND conversation_id=?
         ORDER BY id
         """,#按照消息编号排序，保证聊天顺序。
-        (user_id,)
+        (user_id,conversation_id)
     )
 
 
@@ -77,7 +81,7 @@ def get_history(user_id):
 
 
     return messages
-def save_message(user_id, role, content):#它的作用是把一条消息写入数据库
+def save_message(user_id, conversation_id, role, content):#它的作用是把一条消息写入数据库
 
     conn=get_connection()
 
@@ -87,14 +91,16 @@ def save_message(user_id, role, content):#它的作用是把一条消息写入�
     cursor.execute(
         """
         INSERT INTO messages
-        (user_id,role,content)
+        (user_id,role,content,conversation_id)
 
-        VALUES(?,?,?)
+        VALUES(?,?,?,?)
         """,#使用 ? 而不是直接拼接字符串，是更安全、更规范的数据库参数传递方式
         (
             user_id,
             role,
-            content
+            content,
+            conversation_id
+            
         )
     )
 

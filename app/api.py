@@ -7,6 +7,8 @@ from fastapi.responses import FileResponse
 from app.database import init_db, save_message, get_history
 
 app = FastAPI()
+USER_ID = 1
+CONVERSATION_ID = 1
 init_db()
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
@@ -42,7 +44,7 @@ def health():
 @app.get("/history")
 def history():
     return {
-        "messages": get_history(1)
+        "messages":get_history(USER_ID, CONVERSATION_ID)
     }
 
 @app.post("/chat")
@@ -56,9 +58,10 @@ def chat_api(request: ChatRequest):
         })
 
     try:
-        save_message(1, "user", messages[-1]["content"])#-1表示最新的一条消息，就是本次用户输入
-        answer = chat(messages)
-        save_message(1, "assistant", answer)
+        save_message(USER_ID,CONVERSATION_ID, "user", messages[-1]["content"])#-1表示最新的一条消息，就是本次用户输入
+        recent_messages=messages[-10:]
+        answer = chat(recent_messages)
+        save_message(USER_ID,CONVERSATION_ID, "assistant", answer)#大写代表是常量
 
         return {
             "answer": answer
