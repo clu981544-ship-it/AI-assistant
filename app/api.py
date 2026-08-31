@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.llm import chat
@@ -49,8 +49,15 @@ def chat_api(request: ChatRequest):
             "content": message.content,
         })
 
-    answer = chat(messages)
+    try:
+        answer = chat(messages)
 
-    return {
-        "answer": answer
-    }
+        return {
+            "answer": answer
+        }
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="模型服务调用失败"
+        )
