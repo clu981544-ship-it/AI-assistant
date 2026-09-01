@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from app.llm import chat
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from app.database import init_db, save_message, get_history
+from app.database import init_db, save_message, get_history,clear_conversation
 
 app = FastAPI()
 USER_ID = 1
@@ -46,7 +46,12 @@ def history():
     return {
         "messages":get_history(USER_ID, CONVERSATION_ID)
     }
-
+@app.delete("/conversation")
+def clear_current_conversation():
+    clear_conversation(USER_ID,CONVERSATION_ID)
+    return{
+        "message":"会话已经清空"
+    }
 @app.post("/chat")
 def chat_api(request: ChatRequest):
     messages = []

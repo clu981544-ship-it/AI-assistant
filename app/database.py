@@ -109,4 +109,18 @@ def save_message(user_id, conversation_id, role, content):#它的作用是把一
 
     conn.close()
 
-   
+def clear_conversation(user_id,conversation_id):
+    conn = get_connection()
+    
+    cursor = conn.cursor()
+    
+    cursor.execute(
+     """
+     DELETE FROM messages
+     WHERE user_id=?
+     AND conversation_id=?
+     """  ,
+     (user_id,conversation_id)
+    )
+    conn.commit()
+    conn.close()

@@ -29,6 +29,20 @@ async function loadHistory() {
         chatBox.appendChild(messageElement);
     }
 }
+async function clearConversation() {
+    const response = await fetch("/conversation", {
+        method: "DELETE"
+    });
+
+    if (!response.ok) {
+        return;
+    }
+
+    const chatBox = document.getElementById("chatBox");
+
+    chatBox.innerHTML = "";
+    messages.length = 0;
+}
 async function sendMessage() {
     const input = document.getElementById("messageInput");
     const chatBox = document.getElementById("chatBox");
