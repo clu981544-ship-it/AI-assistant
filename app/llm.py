@@ -22,5 +22,5 @@ def chat(messages: list) -> str:
 
         return response.choices[0].message.content
 
-    except Exception as e:
-        return f"API请求失败：{e}"
+    except Exception:
+        raise
