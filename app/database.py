@@ -1,8 +1,9 @@
+import os
 import sqlite3 #导入sqlite工具
 
 
-DATABASE = "chat.db"#指定数据库文件名
-
+DATABASE = os.getenv("DATABASE_PATH","chat.db")#指定数据库文件名
+#DATABASE = "chat.db"  原来是这个 替换成上面
 
 
 def get_connection():
