@@ -91,6 +91,16 @@ http://127.0.0.1:8000/
 http://127.0.0.1:8000/docs
 ```
 
+## Docker Compose 运行
+
+### 1. 配置环境变量
+
+在项目根目录创建 `.env` 文件：
+
+```env
+APP_NAME=AI Chat Assistant
+DEEPSEEK_API_KEY=你的 DeepSeek API Key
+
 ## API 接口
 
 ### `GET /health`
