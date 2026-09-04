@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    container_name: ai-chat-assistant
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+     - ai-chat-data:/data
+    restart: unless-stopped
+
+volumes:
+  ai-chat-data:
+    external: true
