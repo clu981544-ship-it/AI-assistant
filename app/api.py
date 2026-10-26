@@ -1,12 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field,field_validator
 from app.llm import chat
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.database import init_db, save_message, get_history,clear_conversation
 from app.logging_config import logger
-
+from typing import Literal
 app = FastAPI()
 USER_ID = 1
 CONVERSATION_ID = 1
@@ -23,13 +23,22 @@ app.add_middleware(
 
 
 class Message(BaseModel):
-    role: str
+    role: Literal["user","assistant"]
     content: str
-
-
+    @field_validator("content")
+    @classmethod
+    def validate_content(cls,value:str) -> str:
+        if not value.strip():
+            raise ValueError("消息正文不能为空或全是空白")
+        return value
 class ChatRequest(BaseModel):
-    messages: list[Message]
-
+    messages:list[Message]=Field(...,min_length=1)
+    @field_validator("messages")
+    @classmethod
+    def validate_last_message(cls, value: list[Message]) -> list[Message]:
+        if value[-1].role != "user":
+            raise ValueError("最后一条消息必须是用户消息")
+        return value
 
 @app.get("/")
 def root():
