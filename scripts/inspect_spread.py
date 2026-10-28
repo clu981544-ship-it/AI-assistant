@@ -13,16 +13,17 @@ OUTPUT_PATH=(
 def parse_printed_page(footer_text: str) -> int | None:
     remaining = re.sub(r"\bLaw\s+\d+\b", "", footer_text)
 
-    candidates = [
-        part
+    # 图示页可能在文字层重复保存同一个页码；相同号码不构成歧义。
+    candidates = {
+        int(part)
         for part in remaining.split()
         if part.isdecimal()
-    ]
+    }
 
     if len(candidates) != 1:
         return None
 
-    return int(candidates[0])
+    return next(iter(candidates))
 def parse_law_metadata(footer_text: str) -> tuple[int | None, str | None]:
     match = re.search(
         r"\|\s*Law\s+(\d+)\s*\|\s*(.+)",
